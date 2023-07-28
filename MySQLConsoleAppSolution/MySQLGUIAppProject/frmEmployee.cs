@@ -8,28 +8,39 @@ namespace MySQLGUIAppProject
     public partial class frmEmployee : Form
     {
         //  Declare and initialize global constants
-        const int MINDEPTCODE   =       1;
-        const int MAXDEPTCODE   =       7;
-        const decimal MINSALARY =       0.00M;
-        const decimal MAXSALARY = 1000000.00M;
+        const int MINDEPTCODE   =       1;          //  Dept code must be >= 1 && <= 7
+        const int MAXDEPTCODE   =       7;          //  Dept code must be >= 1 && <= 7
+        const decimal MINSALARY =       0.00M;      //  Minimum salary
+        const decimal MAXSALARY = 1000000.00M;      //  Maximum salary
 
         //	Set up MySQL and Data variables
+        //  https://docs.devart.com/dotconnect/mysql/Devart.Data.MySql~Devart.Data.MySql.MySqlConnection.html
         MySqlConnection sqlConn     = new MySqlConnection();
+
+        //  https://docs.devart.com/dotconnect/mysql/Devart.Data.MySql~Devart.Data.MySql.MySqlCommand.html?highlight=mysqlcommand%2C
         MySqlCommand sqlCmd         = new MySqlCommand();
+
+        //  https://docs.devart.com/dotconnect/mysql/Devart.Data.MySql~Devart.Data.MySql.MySqlDataReader.html
         MySqlDataReader sqlReader   = null;
+
+        //  https://docs.devart.com/dotconnect/mysql/Devart.Data.MySql~Devart.Data.MySql.MySqlDataAdapter.html
         MySqlDataAdapter sqlDA      = new MySqlDataAdapter();
         DataTable sqlDT             = new DataTable();
         DataSet sqlDS               = new DataSet();
         String sqlQuery;
 
+        //  https://learn.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlconnection.connectionstring?view=dotnet-plat-ext-7.0
+        //  https://www.connectionstrings.com/mysql-connector-net-mysqlconnection/
+        //  https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html
+        //	Set up the connection string variable
         //	Set up connection parameters
         string server   = "localhost";
         string userName = "root";
         string password = "";
         string database = "acme_widget";
 
-        int id;                 //  Inputted employee id
-        int dc;                 //  Inputted employee department code
+        int id;                                     //  Inputted employee id
+        int dc;                                     //  Inputted employee department code
 
         public frmEmployee()
         {
@@ -38,11 +49,14 @@ namespace MySQLGUIAppProject
 
         private void frmEmployee_Load(object sender, EventArgs e)
         {
+            //  Call method to fill up dataGridView
             UploadData();
         }
         
         private void SetConnectionString()
         {
+            //  Sets connection string as follows:
+            //  Server=localhost;UID=root;PWD="";Database=acme_widget;
             sqlConn.ConnectionString = "Server=" + server + ";" +
                "UID=" + userName + ";" +
                "PWD=" + password + ";" +
@@ -54,15 +68,21 @@ namespace MySQLGUIAppProject
             SetConnectionString();
 
             sqlConn.Open();
+
             sqlCmd.Connection = sqlConn;
+
+            //  https://dev.mysql.com/doc/connector-net/en/connector-net-programming-mysqlcommand.html#connector-net-programming-mysqlcommand-text-type
             sqlCmd.CommandText = "SELECT * FROM employee";
 
+            //  https://docs.devart.com/dotconnect/mysql/Devart.Data.MySql~Devart.Data.MySql.MySqlCommand~ExecuteReader().html
             sqlReader = sqlCmd.ExecuteReader();
+
+            //  https://docs.devart.com/dotconnect/mysql/Devart.Data~Devart.Common.DbLoader~LoadTable.html?highlight=datatable%2C
             sqlDT.Load(sqlReader);
             sqlReader.Close();
             sqlConn.Close();
 
-            dgvSalesOrders.DataSource = sqlDT;
+            dgvAcmeWidget.DataSource = sqlDT;
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -98,12 +118,14 @@ namespace MySQLGUIAppProject
 
                     //  Set SQL DataReader object
                     sqlReader = sqlCmd.ExecuteReader();
-
                 }
             }
             catch (Exception ex)
             {
                 ShowMessage(ex.Message, "ERROR");
+
+                //  Close connection
+                sqlConn.Close();
             }
             finally
             {
@@ -210,19 +232,19 @@ namespace MySQLGUIAppProject
             result = Int32.TryParse(txtID.Text, out id);
             if (!result || id <= 0)
             {
-                errMsg += "You Must Enter A Positive Number For The Employee ID!";
+                errMsg += "You Must Enter A Positive Number For The Employee ID\n";
             }
 
             //  Validate the value in the department code is between 1 and 7
             result = Int32.TryParse(txtDepartmentCode.Text, out dc);
             if ((!result) || ((dc < MINDEPTCODE) || (dc > MAXDEPTCODE)))
             {
-                errMsg += "\nYou Must Enter A Department Code Between " +
-                            MINDEPTCODE + " and " + MAXDEPTCODE + "!";
+                errMsg += "You Must Enter A Department Code Between " +
+                            MINDEPTCODE + " and " + MAXDEPTCODE + "\n";
             }
 
             //  Validate the value in the salary is between 0 and 1000000
-            result = Int32.TryParse(txtDepartmentCode.Text, out dc);
+            result = Int32.TryParse(txtSalary.Text, out dc);
             errMsg += Validator.IsWithinRange(
                                 txtSalary.Text,
                                 txtSalary.Tag.ToString(),
@@ -255,39 +277,41 @@ namespace MySQLGUIAppProject
                 //  Open the connections
                 sqlConn.Open();
 
+                //MySqlCommand sqlCmd2 = new MySqlCommand();
+
                 //  Set the SQL command object to the sqlConn
                 sqlCmd.Connection = sqlConn;
 
                 //  Set the SQL command text
                 sqlCmd.CommandText =
-                    "UPDATE employee SET first_name = @first_name, last_name = @last_name, address = @address, cit = @city, state_code = @state_code, zip = @zip, phone = @phone, department_code = @department_code, salary = @salary";
-
+                    "UPDATE employee SET first_name = @first_name, last_name = @last_name, address = @address, city = @city, state_code = @state_code, zip = @zip, phone = @phone, department_code = @department_code, salary = @salary WHERE employeeid = @employeeid";
+                //employeeid = @employeeid, 
                 sqlCmd.CommandType = CommandType.Text;
 
+                //  https://docs.devart.com/dotconnect/mysql/Devart.Data.MySql~Devart.Data.MySql.MySqlParameterCollection_members.html?highlight=addwithvalue%2C
                 //  Associate "@" parameters with their
                 //  respective textbox values
-                //sqlCmd.Parameters.AddWithValue("@employeeid", txtID.Text);
+                sqlCmd.Parameters.AddWithValue("@employeeid", txtID.Text);
                 sqlCmd.Parameters.AddWithValue("@first_name", txtFirstName.Text);
                 sqlCmd.Parameters.AddWithValue("@last_name",  txtLastName.Text);
                 sqlCmd.Parameters.AddWithValue("@address"  ,  txtAddress.Text);
                 sqlCmd.Parameters.AddWithValue("@city",       txtCity.Text);
-                sqlCmd.Parameters.AddWithValue("@state",      txtState.Text);
+                sqlCmd.Parameters.AddWithValue("@state_code", txtState.Text);
                 sqlCmd.Parameters.AddWithValue("@zip",        txtZipCode.Text);
                 sqlCmd.Parameters.AddWithValue("@phone",      txtPhone.Text);
                 sqlCmd.Parameters.AddWithValue("@department_code", txtDepartmentCode.Text);
                 sqlCmd.Parameters.AddWithValue("@salary",     txtSalary.Text);
 
+                //  https://learn.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlcommand.executenonquery?view=dotnet-plat-ext-7.0
                 sqlCmd.ExecuteNonQuery();
+
+                sqlConn.Close();
+                UploadData();
             }
             catch (Exception ex)
             {
                 ShowMessage(ex.Message, "ERROR");
             }
-
-            //  Close the connection
-            sqlConn.Close();
-
-            UploadData();
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
@@ -309,33 +333,36 @@ namespace MySQLGUIAppProject
 
                 DialogResult dialog = MessageBox.Show(
                     "Are You Sure You Want To Delete This Employee Record?",
-                    "DELECT CURRENT EMPLOYEE RECORD",
+                    "DELETE CURRENT EMPLOYEE RECORD",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question);
 
                 if (dialog == DialogResult.Yes)
                 {
+                    //  https://dev.mysql.com/doc/connector-net/en/connector-net-tutorials-parameters.html
+                    sqlCmd.Parameters.Add(new MySqlParameter("@employeeid", txtID.Text));
+
+                    //  https://dev.mysql.com/doc/dev/connector-net/latest/api/data_api/MySql.Data.MySqlClient.MySqlCommand.html
                     sqlCmd.CommandText = "DELETE FROM employee WHERE employeeid = @employeeid";
 
-                    sqlCmd = new MySqlCommand(sqlQuery, sqlConn);
+                    sqlCmd.ExecuteNonQuery();
 
-                    foreach(DataGridViewRow item in this.dgvSalesOrders.SelectedRows)
+                    sqlConn.Close();
+
+                    foreach (DataGridViewRow item in this.dgvAcmeWidget.SelectedRows)
                     {
-                        dgvSalesOrders.Rows.RemoveAt(item.Index);
+                        //  https://mysqlcode.com/mysql-delete/
+                        dgvAcmeWidget.Rows.RemoveAt(item.Index);
                     }
                 }
-
-                ClearEmployeeInfoAndSearch();
             }
             catch (Exception ex)
             {
                 ShowMessage(ex.Message, "ERROR");
             }
-            finally
-            {
-                sqlConn.Close();
-                UploadData();
-            }
+
+            ClearEmployeeInfoAndSearch();
+            UploadData();
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -391,7 +418,7 @@ namespace MySQLGUIAppProject
             }
         }
 
-        private void dgvSalesOrders_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void dgvAcmeWidget_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             FillUpEmployeeTextBoses();
         }
@@ -400,16 +427,16 @@ namespace MySQLGUIAppProject
         {
             try
             {
-                txtID.Text              = dgvSalesOrders.SelectedRows[0].Cells[0].Value.ToString();
-                txtFirstName.Text       = dgvSalesOrders.SelectedRows[0].Cells[1].Value.ToString();
-                txtLastName.Text        = dgvSalesOrders.SelectedRows[0].Cells[2].Value.ToString();
-                txtAddress.Text         = dgvSalesOrders.SelectedRows[0].Cells[3].Value.ToString();
-                txtCity.Text            = dgvSalesOrders.SelectedRows[0].Cells[4].Value.ToString();
-                txtState.Text           = dgvSalesOrders.SelectedRows[0].Cells[5].Value.ToString();
-                txtZipCode.Text         = dgvSalesOrders.SelectedRows[0].Cells[6].Value.ToString();
-                txtPhone.Text           = dgvSalesOrders.SelectedRows[0].Cells[7].Value.ToString();
-                txtDepartmentCode.Text  = dgvSalesOrders.SelectedRows[0].Cells[8].Value.ToString();
-                txtSalary.Text          = dgvSalesOrders.SelectedRows[0].Cells[9].Value.ToString();
+                txtID.Text              = dgvAcmeWidget.SelectedRows[0].Cells[0].Value.ToString();
+                txtFirstName.Text       = dgvAcmeWidget.SelectedRows[0].Cells[1].Value.ToString();
+                txtLastName.Text        = dgvAcmeWidget.SelectedRows[0].Cells[2].Value.ToString();
+                txtAddress.Text         = dgvAcmeWidget.SelectedRows[0].Cells[3].Value.ToString();
+                txtCity.Text            = dgvAcmeWidget.SelectedRows[0].Cells[4].Value.ToString();
+                txtState.Text           = dgvAcmeWidget.SelectedRows[0].Cells[5].Value.ToString();
+                txtZipCode.Text         = dgvAcmeWidget.SelectedRows[0].Cells[6].Value.ToString();
+                txtPhone.Text           = dgvAcmeWidget.SelectedRows[0].Cells[7].Value.ToString();
+                txtDepartmentCode.Text  = dgvAcmeWidget.SelectedRows[0].Cells[8].Value.ToString();
+                txtSalary.Text          = dgvAcmeWidget.SelectedRows[0].Cells[9].Value.ToString();
             }
             catch (Exception ex)
             {
@@ -417,11 +444,19 @@ namespace MySQLGUIAppProject
             }
         }
 
-        private void txtSearch_KeyPress(object sender, KeyPressEventArgs e)
+        private void txtSearch_TextChanged(object sender, EventArgs e)
         {
-            DataView dv               = sqlDT.DefaultView;
-            dv.RowFilter              = string.Format("last_name LIKE '%{0}'", txtSearch.Text);
-            dgvSalesOrders.DataSource = dv.ToTable();
+            try
+            {
+                //  
+                DataView dv = sqlDT.DefaultView;
+                dv.RowFilter = string.Format("last_name LIKE '%{0}%'", txtSearch.Text);
+                dgvAcmeWidget.DataSource = dv.ToTable();
+            }
+            catch (Exception ex)
+            {
+                ShowMessage(ex.Message, "ERROR");
+            }
         }
 
         private void ShowMessage(string msg, string title)

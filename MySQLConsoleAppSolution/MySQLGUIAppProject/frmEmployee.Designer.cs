@@ -55,10 +55,10 @@
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnUpdate = new System.Windows.Forms.Button();
             this.btnAdd = new System.Windows.Forms.Button();
-            this.dgvSalesOrders = new System.Windows.Forms.DataGridView();
+            this.dgvAcmeWidget = new System.Windows.Forms.DataGridView();
             this.gbEmployeeInfo.SuspendLayout();
             this.gbButtons.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvSalesOrders)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvAcmeWidget)).BeginInit();
             this.SuspendLayout();
             // 
             // gbEmployeeInfo
@@ -309,7 +309,8 @@
             this.txtSearch.Name = "txtSearch";
             this.txtSearch.Size = new System.Drawing.Size(184, 32);
             this.txtSearch.TabIndex = 0;
-            this.txtSearch.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtSearch_KeyPress);
+            this.txtSearch.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
             // 
             // lblSearch
             // 
@@ -378,14 +379,14 @@
             this.btnAdd.UseVisualStyleBackColor = true;
             this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
-            // dgvSalesOrders
+            // dgvAcmeWidget
             // 
-            this.dgvSalesOrders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvSalesOrders.Location = new System.Drawing.Point(40, 535);
-            this.dgvSalesOrders.Name = "dgvSalesOrders";
-            this.dgvSalesOrders.Size = new System.Drawing.Size(1200, 255);
-            this.dgvSalesOrders.TabIndex = 0;
-            this.dgvSalesOrders.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvSalesOrders_CellClick);
+            this.dgvAcmeWidget.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvAcmeWidget.Location = new System.Drawing.Point(40, 535);
+            this.dgvAcmeWidget.Name = "dgvAcmeWidget";
+            this.dgvAcmeWidget.Size = new System.Drawing.Size(1200, 255);
+            this.dgvAcmeWidget.TabIndex = 0;
+            this.dgvAcmeWidget.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvAcmeWidget_CellClick);
             // 
             // frmEmployee
             // 
@@ -395,7 +396,7 @@
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
             this.CancelButton = this.btnClear;
             this.ClientSize = new System.Drawing.Size(1290, 802);
-            this.Controls.Add(this.dgvSalesOrders);
+            this.Controls.Add(this.dgvAcmeWidget);
             this.Controls.Add(this.gbButtons);
             this.Controls.Add(this.gbEmployeeInfo);
             this.Name = "frmEmployee";
@@ -406,7 +407,7 @@
             this.gbEmployeeInfo.PerformLayout();
             this.gbButtons.ResumeLayout(false);
             this.gbButtons.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvSalesOrders)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvAcmeWidget)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -421,7 +422,7 @@
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.Button btnUpdate;
         private System.Windows.Forms.Button btnAdd;
-        private System.Windows.Forms.DataGridView dgvSalesOrders;
+        private System.Windows.Forms.DataGridView dgvAcmeWidget;
         private System.Windows.Forms.TextBox txtFirstName;
         private System.Windows.Forms.TextBox txtLastName;
         private System.Windows.Forms.TextBox txtAddress;
